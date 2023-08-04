@@ -24,12 +24,34 @@ function addMessage(nickname, text) {
 function createMessageElement(nickname, text) {
     const messageElement = document.createElement('div');
     messageElement.classList.add('message', (nickname === getSavedNickname()) ? 'outgoing' : 'incoming');
-    messageElement.innerHTML = `<p>${text}</p><span class="message-sender">${nickname}</span>`;
+    messageElement.innerHTML = `<p><strong>${nickname}:</strong> ${text}</p>`;
     return messageElement;
 }
 
 function saveMessage(nickname, message) {
-    console.log(`Saving message: ${nickname} - ${message}`);
+    fetch('https://jsonplaceholder.typicode.com/posts', {
+        method: 'POST',
+        body: JSON.stringify({
+            title: nickname,
+            body: message,
+            userId: 1,
+        }),
+        headers: {
+            'Content-type': 'application/json; charset=UTF-8',
+        },
+    })
+    .then((response) => response.json())
+    .then((json) => console.log(json));
+}
+
+function getMessagesFromServer() {
+    fetch('https://jsonplaceholder.typicode.com/posts/1')
+    .then((response) => response.json())
+    .then((json) => {
+        const nickname = json.title;
+        const message = json.body;
+        addMessage(nickname, message);
+    });
 }
 
 function cleanUpChat() {
